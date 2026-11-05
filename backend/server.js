@@ -64,7 +64,11 @@ async function checkLowStockAndNotifyAdmin() {
 
 app.use(
   cors({
-    origin: ["http://localhost:5173", "http://localhost:5174"]
+    origin: [
+      process.env.FRONTEND_URL,
+      "http://localhost:5173",
+      "http://localhost:5174"
+    ].filter(Boolean)
   })
 );
 app.use(express.json());
@@ -155,7 +159,7 @@ app.post("/api/auth/register", async (req, res) => {
   html: `
     <h2>Welcome to Pizza Delivery!</h2>
     <p>Click the link below to verify your email address:</p>
-    <a href="http://10.240.111.136:5000/api/auth/verify-email?token=${verificationToken}">
+    <a href="${process.env.BACKEND_URL}/api/auth/verify-email?token=${verificationToken}">
       Verify My Email
     </a>
     <p>This link expires in 24 hours.</p>
@@ -314,8 +318,7 @@ app.post("/api/auth/forgot-password", async (req, res) => {
     await user.save();
 
     const resetLink =
-      `http://localhost:5173/reset-password?token=${resetToken}`;
-
+  `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
     await emailTransporter.sendMail({
       from: process.env.EMAIL_USER,
       to: user.email,
